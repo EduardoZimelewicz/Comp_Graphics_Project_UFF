@@ -1,68 +1,144 @@
+# -*- coding: utf-8 -*-
 from graphics import *
+import sys, math, time
+
+class Vertice:
+    def __init__(self, coordenadas):
+        self.x = coordenadas[0]
+        self.y = coordenadas[1]
+        self.z = coordenadas[2]
+
+class Aresta:
+    def __init__(self, ini, fim):
+        self.ini = ini
+        self.fim = fim
+
+class Solido:
+    def __init__(self):
+        self.vertices = []
+        self.arestas = []
+
+    def addVertices(self, vertLista):
+        for ver in vertLista:
+            self.vertices.append(Vertice(ver))
+
+    def addArestas(self, arestLista):
+        for (ini, fim) in arestLista:
+            self.arestas.append(Aresta(self.vertices[ini], self.vertices[fim]))
+    
+    def outVertices(self):
+        print ("\n --- Vertices --- ")
+        for i, vertice in enumerate(self.vertices):
+            print " %d: (%.2f, %.2f, %.2f)" % (i, vertice.x, vertice.y, vertice.z)
+
+    def outArestas(self):
+        print "\n --- Arestas --- "
+        for i, aresta in enumerate(self.arestas):
+            print "%d: (%.2f, %.2f, %.2f)" % (i, aresta.ini.x, aresta.ini.y, aresta.ini.z)
+            print "para (%.2f, %.2f, %.2f)" % (aresta.fim.x,  aresta.fim.y, aresta.fim.z)
+
+    def getCentro(self):
+        n_vertices = len(self.vertices)
+        midX = sum([vertice.x for vertice in self.vertices]) / n_vertices
+        midY = sum([vertice.y for vertice in self.vertices]) / n_vertices
+        midZ = sum([vertice.z for vertice in self.vertices]) / n_vertices
+
+        return(midX, midY, midZ)
+
+    def rotZ(self, (cx, cy, cz), radianos):
+        for vertice in self.vertices:
+            x = vertice.x - cx
+            y = vertice.y - cy
+            distancia = math.hypot(y,x)
+            teta = math.atan2(y,x) + radianos
+            vertice.x = cx + distancia * math.cos(teta)
+            vertice.y = cy + distancia * math.sin(teta)
+
+    def rotY(self, (cx, cy, cz), radianos):
+        for vertice in self.vertices:
+            x = vertice.x - cx
+            z = vertice.z - cz
+            distancia = math.hypot(x,z)
+            teta = math.atan2(x,z) + radianos
+            vertice.z = cz + distancia * math.cos(teta)
+            vertice.x = cx + distancia * math.sin(teta)
+
+    def rotX(self, (cx, cy, cz), radianos):
+        for vertice in self.vertices:
+            y = vertice.y - cy
+            z = vertice.z - cz
+            distancia = math.hypot(y,z)
+            teta = math.atan2(y,z) + radianos
+            vertice.z = cz + distancia * math.cos(teta)
+            vertice.y = cy + distancia * math.sin(teta)
+
+
+    def translacao(self, eixo, distancia):
+        if eixo in ['x','y','z']:
+            for vertice in self.vertices:
+                setattr(vertice, eixo, getattr(vertice, eixo) + distancia)
+
+
+    def escala(self, (centro_x, centro_y), escala):
+        for vertice in self.vertices:
+            vertice.x = centro_x + escala * (vertice.x - centro_x)
+            vertice.y = centro_y + escala * (vertice.y - centro_y)
+            vertice.z *= escala
+
+    def desenha(self, grafico):
+        for aresta in self.arestas:
+            ptI = Point(aresta.ini.x, aresta.ini.y)
+            ptF = Point(aresta.fim.x, aresta.fim.y)
+            ln = Line(ptI, ptF)
+            ln.draw(grafico)
+        for vertice in self.vertices:
+            c = Circle(Point(int(vertice.x), int(vertice.y)), 2)
+            c.draw(grafico)
 
 def main():
-    janela = GraphWin("janela", 700, 700)
+    w,h = 500,500
+    cx,cy = w//2, h//2
+    janela = GraphWin("janela", w, h, autoflush=False)
     janela.setBackground(color_rgb(255,255,255))
-    hexa = [
-        [50, 125, 1],
-        [125, 200, 1],
-        [250, 200, 1],
-        [325, 125, 1],
-        [125, 50, 1],
-        [250, 50, 1]]
 
-    escala_x = [
-        [2, 0],
-        [0, 1]]
-    escala_y = [
-        [1, 0],
-        [0, 2]]
+    cuboVertices = [(x,y,z) for x in (25,125) for y in (25, 125) for z in (25, 125)]
+    cubo = Solido()
+    cubo.addVertices(cuboVertices)
 
-    cis_x = [
-        [1, 2],
-        [0, 1]]
-    cis_y = [
-        [1, 0],
-        [2, 1]]
+    cubo.addArestas([(n,n+4) for n in range(0,4)])
+    cubo.addArestas([(n,n+1) for n in range(0,8,2)])
+    cubo.addArestas([(n,n+2) for n in (0,1,4,5)])
 
-    perspec = [
-    [1, 0, 0],
-    [0, 1, 0],
-    [2, 2, 1]]
+    #cubo.outVertices()
+    #cubo.outArestas()
 
-    for i in range(0, 6):
-        for j in range(0, 2):
-            sum = 0
-            for k in range(0, 2):
-                sum += hexa[i][k] * escala_x[k][j]
-            hexa[i][j] = sum
+    #cubo.escala((cx, cy), 2) #Funcionando
 
-    pt1 = Point(hexa[0][0], hexa[0][1])
-    pt2 = Point(hexa[1][0], hexa[1][1])
-    pt3 = Point(hexa[2][0], hexa[2][1])
-    pt4 = Point(hexa[3][0], hexa[3][1])
-    pt5 = Point(hexa[4][0],hexa[4][1])
-    pt6 = Point(hexa[5][0],hexa[5][1])
-    ln1 = Line(pt1, pt2)
-    ln2 = Line(pt1, pt5)
-    ln3 = Line(pt2, pt3)
-    ln4 = Line(pt5, pt6)
-    ln5 = Line(pt3, pt4)
-    ln6 = Line(pt6, pt4)
+    janela.autoflush = False
+    for i in range(5):
+        '''
+        key =  janela.checkKey()
+        if(key == "w"):
+            cubo.translacao('y',-50)
+        elif(key == "a"):
+            cubo.translacao('x',-50)
+        elif(key == "s"):
+            cubo.translacao('y',50)
+        elif(key == "d"):
+            cubo.translacao('x', 50)
+        '''
 
-    ln1.setOutline(color_rgb(0, 0, 0))
-    ln2.setOutline(color_rgb(0, 0, 0))
-    ln3.setOutline(color_rgb(0, 0, 0))
-    ln4.setOutline(color_rgb(0, 0, 0))
-    ln5.setOutline(color_rgb(0, 0, 0))
-    ln6.setOutline(color_rgb(0, 0, 0))
+        #cubo.translacao('z', 100) #Projeçao no eixo z
+        #cubo.rotZ(cubo.getCentro(), 0.2) #Funcionando
+        #cubo.rotY(cubo.getCentro(), 0.2) #Funcionando
+        #cubo.rotX(cubo.getCentro(), 0.2) #Funcionando
 
-    ln1.draw(janela)
-    ln2.draw(janela)
-    ln3.draw(janela)
-    ln4.draw(janela)
-    ln5.draw(janela)
-    ln6.draw(janela)
+        cubo.translacao('x', 50)
+        cubo.desenha(janela)
+        janela.flush()
+        time.sleep(.05)
+    janela.autoflush = True
+
 
     janela.getMouse()
     janela.close()
