@@ -25,7 +25,7 @@ class Solido:
     def addArestas(self, arestLista):
         for (ini, fim) in arestLista:
             self.arestas.append(Aresta(self.vertices[ini], self.vertices[fim]))
-    
+
     def outVertices(self):
         print ("\n --- Vertices --- ")
         for i, vertice in enumerate(self.vertices):
@@ -94,6 +94,10 @@ class Solido:
         for vertice in self.vertices:
             c = Circle(Point(int(vertice.x), int(vertice.y)), 2)
             c.draw(grafico)
+def clear(win):
+    for item in win.items[:]:
+        item.undraw()
+    win.update()
 
 def main():
     w,h = 500,500
@@ -101,7 +105,7 @@ def main():
     janela = GraphWin("janela", w, h, autoflush=False)
     janela.setBackground(color_rgb(255,255,255))
 
-    cuboVertices = [(x,y,z) for x in (25,125) for y in (25, 125) for z in (25, 125)]
+    cuboVertices = [(x,y,z) for x in (cx + 25,cy + 125) for y in (cx + 25, cy + 125) for z in (cx + 25, cy + 125)]
     cubo = Solido()
     cubo.addVertices(cuboVertices)
 
@@ -114,14 +118,14 @@ def main():
 
     #cubo.escala((cx, cy), 2) #Funcionando
 
-    janela.autoflush = False
-    for i in range(5):
+    while True:
+
         '''
         key =  janela.checkKey()
         if(key == "w"):
-            cubo.translacao('y',-50)
+            cubo.rotY(cubo.getCentro(), 0.2)
         elif(key == "a"):
-            cubo.translacao('x',-50)
+            cubo.rotX(cubo.getCentro(), 0.2)
         elif(key == "s"):
             cubo.translacao('y',50)
         elif(key == "d"):
@@ -133,11 +137,13 @@ def main():
         #cubo.rotY(cubo.getCentro(), 0.2) #Funcionando
         #cubo.rotX(cubo.getCentro(), 0.2) #Funcionando
 
-        cubo.translacao('x', 50)
-        cubo.desenha(janela)
-        janela.flush()
+        cubo.rotY(cubo.getCentro(), 0.2)
+        cubo.rotX(cubo.getCentro(), 0.2)
+        cubo.rotZ(cubo.getCentro(), 0.2)
         time.sleep(.05)
-    janela.autoflush = True
+        clear(janela)
+        cubo.desenha(janela)
+        update(60)
 
 
     janela.getMouse()
