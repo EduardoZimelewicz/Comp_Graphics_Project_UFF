@@ -26,7 +26,7 @@ class Solido:
         self.vertices = np.vstack((self.vertices, uns_added))
 
     def addArestas(self, arestLista):
-        self.arestas += arestLista
+        self.arestas = arestLista
 
     def outVertices(self):
         print "\n --- Vertices --- "
@@ -118,6 +118,26 @@ class Solido:
         for vertice in self.vertices:
             c = Circle(Point(int(vertice[0]), int(vertice[1])), 2)
             c.draw(grafico)
+    
+    def pinta(self, faces, window):
+        for face in faces:
+            pts = []
+            for i in range(len(face)):
+               pt = Point(self.vertices[face[i]][0], self.vertices[face[i]][1]) 
+               pts.append(pt)
+            p = Polygon(pts)
+            p.setFill("green")
+            p.draw(window)
+    
+    def pintaPontos(self, window):
+        i = 40
+        for vertice in self.vertices:
+            s = ','.join(str(e) for e in vertice)
+            ponto = Text(Point(150,i),s)
+            ponto.setFace("arial")
+            ponto.setStyle("bold")
+            ponto.draw(window)
+            i += 40
 
 def clear(win):
     for item in win.items[:]:
@@ -125,29 +145,49 @@ def clear(win):
     win.update()
 
 def main():
-    w,h = 500,500
+    w,h = 700,700
     janela = GraphWin("janela", w, h, autoflush=False)
     janela.setBackground(color_rgb(255,255,255))
     cx,cy = w//2, h//2
-    cuboVertices = [(x,y,z) for x in (25 + cx, 125 + cx)
-                    for y in (25 + cy, 125 + cy)
-                    for z in (25, 125)]
-    cubo = Solido()
-    cubo.addVertices(np.array(cuboVertices))
+   
+    hexagonVertices = [[25,400,20],
+                      [30,410,20],
+                      [40,410,20],
+                      [45,400,20],
+                      [40,390,20],
+                      [30,390,20],
+                      [25,400,40],
+                      [30,410,40],
+                      [40,410,40],
+                      [45,400,40],
+                      [40,390,40],
+                      [30,390,40]]
+                      
+    hexagonArestas = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,6],[1,7],[2,8],[3,9],[4,10],[5,11],[6,7],[7,8],[8,9],[9,10],[10,11],[11,6]]
+    hexagonoFaces1 = [[0,6,7,1], [1,7,8,2], [2,8,9,3], [3,9,10,4], [4,5,11,10], [5,0,6,11]]
+    hexagonoFaces2 = [[0,1,2,3,4,5], [6,7,8,9,10,11]]
 
-    cubo.addArestas([(n,n+4) for n in range(0,4)])
-    cubo.addArestas([(n,n+1) for n in range(0,8,2)])
-    cubo.addArestas([(n,n+2) for n in (0,1,4,5)])
+    hexagono = Solido()
+    hexagono.addVertices(np.array(hexagonVertices))
+    hexagono.addArestas(hexagonArestas)
+    #hexagono.outVertices()
+    #hexagono.outArestas()
 
+    hexagono.escala(6,6,6)
+    hexagono.translacao(450,-150,0)
+   
     while True:
-        cubo.rotX(0.1)
-        cubo.rotY(0.1)
-        cubo.rotZ(0.1)
+        hexagono.rotX(0.1)
+        hexagono.rotY(0.1)
+        hexagono.rotZ(0.1)
         time.sleep(.05)
         clear(janela)
-        cubo.desenha(janela)
+        hexagono.pinta(hexagonoFaces1, janela)
+        hexagono.pinta(hexagonoFaces2, janela)
+        hexagono.pintaPontos(janela)
+        hexagono.desenha(janela)
         update(60)
-
+    
     janela.getMouse()
     janela.close()
 main()
