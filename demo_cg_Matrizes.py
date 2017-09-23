@@ -110,38 +110,75 @@ class Solido:
         return(vert[0], vert[1], vert[2])
 
     def desenha(self, grafico):
-        for n1,n2 in self.arestas:
-            ptI = Point(self.vertices[n1][0], self.vertices[n1][1])
-            ptF = Point(self.vertices[n2][0], self.vertices[n2][1])
-            ln = Line(ptI, ptF)
-            ln.draw(grafico)
+        '''
         for vertice in self.vertices:
             c = Circle(Point(int(vertice[0]), int(vertice[1])), 2)
+            time.sleep(.1)
             c.draw(grafico)
+            update(60)
+    	'''
+
+        for n1,n2 in self.arestas:
+            ptI = Point(int(self.vertices[n1][0]), int(self.vertices[n1][1]))
+            ptF = Point(int(self.vertices[n2][0]), int(self.vertices[n2][1]))
+            cI = Circle(ptI, 3)
+            cF = Circle(ptF, 3)
+            cI.setFill("yellow")
+            cI.draw(grafico)
+            time.sleep(.2)
+            update(60)
+            ln = Line(ptI, ptF)
+            ln.draw(grafico)
+            time.sleep(.2)
+            update(60)
+            cF.setFill("red")
+            cF.draw(grafico)
+            time.sleep(.2)
+            update(60)
+            cF.setFill("yellow")
+            time.sleep(.2)
+            update(60)
     
     def pinta(self, faces, window):
+        cores = ["green", "blue", "grey", "orange", "purple"]
+        j = 0
         for face in faces:
             pts = []
             for i in range(len(face)):
                pt = Point(self.vertices[face[i]][0], self.vertices[face[i]][1]) 
                pts.append(pt)
             p = Polygon(pts)
-            p.setFill("green")
+            p.setFill(cores[j])
+            p.setOutline("black")
             p.draw(window)
+            time.sleep(.4)
+            update(60)
+            if (j > 3):
+                j = 0
+            j += 1
     
     def pintaPontos(self, window):
         i = 40
+        pontos = []
         for vertice in self.vertices:
-            s = ','.join(str(e) for e in vertice)
-            ponto = Text(Point(150,i),s)
-            ponto.setFace("arial")
-            ponto.setStyle("bold")
-            ponto.draw(window)
+            s = ' ,'.join(str(e) for e in vertice)
+            ponto = Point(150,i)
+            pontos.append(ponto)
+            txt = Text(ponto,s)
+            txt.setFace("arial")
+            txt.setStyle("bold")
+            txt.draw(window)
             i += 40
+        return pontos
 
 def clear(win):
     for item in win.items[:]:
         item.undraw()
+    win.update()
+
+def drawAll(win):
+    for item in win.items[:]:
+        item.draw(win)
     win.update()
 
 def main():
@@ -164,8 +201,7 @@ def main():
                       [30,390,40]]
                       
     hexagonArestas = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,6],[1,7],[2,8],[3,9],[4,10],[5,11],[6,7],[7,8],[8,9],[9,10],[10,11],[11,6]]
-    hexagonoFaces1 = [[0,6,7,1], [1,7,8,2], [2,8,9,3], [3,9,10,4], [4,5,11,10], [5,0,6,11]]
-    hexagonoFaces2 = [[0,1,2,3,4,5], [6,7,8,9,10,11]]
+    hexagonoFaces1 = [[6,7,8,9,10,11], [1,7,8,2], [2,8,9,3], [3,9,10,4], [4,5,11,10], [5,0,6,11], [0,6,7,1], [0,1,2,3,4,5]]
 
     hexagono = Solido()
     hexagono.addVertices(np.array(hexagonVertices))
@@ -175,19 +211,36 @@ def main():
 
     hexagono.escala(6,6,6)
     hexagono.translacao(450,-150,0)
-   
-    while True:
-        hexagono.rotX(0.1)
-        hexagono.rotY(0.1)
-        hexagono.rotZ(0.1)
-        time.sleep(.05)
-        clear(janela)
-        hexagono.pinta(hexagonoFaces1, janela)
-        hexagono.pinta(hexagonoFaces2, janela)
-        hexagono.pintaPontos(janela)
-        hexagono.desenha(janela)
-        update(60)
+    hexagono.rotX(0.5)
+    hexagono.rotY(0.5)
     
+    pontos = hexagono.pintaPontos(janela)
+    hexagono.desenha(janela)
+    hexagono.pinta(hexagonoFaces1, janela)
+    update(60)
+   
+    '''
+    while True:
+       clk = janela.checkMouse()
+       for i in range(12):
+           if(clk == pontos[i]):
+               pt = Point(pontos[i][0], pontos[i][1])
+               pt.setFill("red")
+               pt.draw(janela)
+               update(60)
+               pt.undraw()
+
+        while True:
+            time.sleep(.05)
+            clear(janela)
+            hexagono.rotX(0.5)
+            hexagono.rotY(0.5)
+            hexagono.rotZ(0.5)
+            drawAll(janela)
+            time.sleep(0.5)
+            update(60)
+    '''
+
     janela.getMouse()
     janela.close()
 main()
