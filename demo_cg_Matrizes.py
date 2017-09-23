@@ -110,14 +110,6 @@ class Solido:
         return(vert[0], vert[1], vert[2])
 
     def desenha(self, grafico):
-        '''
-        for vertice in self.vertices:
-            c = Circle(Point(int(vertice[0]), int(vertice[1])), 2)
-            time.sleep(.1)
-            c.draw(grafico)
-            update(60)
-    	'''
-
         for n1,n2 in self.arestas:
             ptI = Point(int(self.vertices[n1][0]), int(self.vertices[n1][1]))
             ptF = Point(int(self.vertices[n2][0]), int(self.vertices[n2][1]))
@@ -151,7 +143,7 @@ class Solido:
             p.setFill(cores[j])
             p.setOutline("black")
             p.draw(window)
-            time.sleep(.4)
+            time.sleep(.2)
             update(60)
             if (j > 3):
                 j = 0
@@ -161,13 +153,16 @@ class Solido:
         i = 40
         pontos = []
         for vertice in self.vertices:
-            s = ' ,'.join(str(e) for e in vertice)
-            ponto = Point(150,i)
-            pontos.append(ponto)
-            txt = Text(ponto,s)
+            s = ' ,'.join(str(e) for e in (vertice[0], vertice[1], vertice[2]))
+            ponto = Point(10,i)
+            pontos.append((10,i))
+            clique = Circle(ponto, 6)
+            txt = Text(Point(200,i),s)
             txt.setFace("arial")
             txt.setStyle("bold")
+            clique.setFill("blue")
             txt.draw(window)
+            clique.draw(window)
             i += 40
         return pontos
 
@@ -176,13 +171,8 @@ def clear(win):
         item.undraw()
     win.update()
 
-def drawAll(win):
-    for item in win.items[:]:
-        item.draw(win)
-    win.update()
-
 def main():
-    w,h = 700,700
+    w,h = 800,800
     janela = GraphWin("janela", w, h, autoflush=False)
     janela.setBackground(color_rgb(255,255,255))
     cx,cy = w//2, h//2
@@ -210,37 +200,26 @@ def main():
     #hexagono.outArestas()
 
     hexagono.escala(6,6,6)
-    hexagono.translacao(450,-150,0)
+    hexagono.translacao(550,-150,0)
     hexagono.rotX(0.5)
     hexagono.rotY(0.5)
     
-    pontos = hexagono.pintaPontos(janela)
+    print hexagono.vertices[0][0]
+    hexagono.pintaPontos(janela)
     hexagono.desenha(janela)
     hexagono.pinta(hexagonoFaces1, janela)
     update(60)
    
-    '''
     while True:
-       clk = janela.checkMouse()
-       for i in range(12):
-           if(clk == pontos[i]):
-               pt = Point(pontos[i][0], pontos[i][1])
-               pt.setFill("red")
-               pt.draw(janela)
-               update(60)
-               pt.undraw()
-
-        while True:
-            time.sleep(.05)
-            clear(janela)
-            hexagono.rotX(0.5)
-            hexagono.rotY(0.5)
-            hexagono.rotZ(0.5)
-            drawAll(janela)
-            time.sleep(0.5)
-            update(60)
-    '''
-
+        ponto = input("Gostaria de ver algum vértice? Diga o número dele: ")
+        pt = Circle(Point(hexagono.vertices[ponto][0], hexagono.vertices[ponto][1]), 4)
+        pt.setFill("red")
+        pt.draw(janela)
+        update(60)
+        time.sleep(.2)
+        pt.undraw()
+        update(60)
+    
     janela.getMouse()
     janela.close()
 main()
