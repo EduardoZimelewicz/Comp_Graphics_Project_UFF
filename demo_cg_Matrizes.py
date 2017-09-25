@@ -120,12 +120,12 @@ class Solido:
         self.vertices = self.vertices.transpose()
         self.translacao(centro[0], centro[1], centro[2])
 
-    def projObliqua(self, ang, l):
+    def projObliquaCabinet(self, ang, l):
         c = np.cos(ang)
         s = np.sin(ang)
 
-        obl = np.array([[1, 0, l*c, 0],
-                       [0, 1, l*s, 0],
+        obl = np.array([[1, 0, (l*c)/2, 0],
+                       [0, 1, (l*s)/2, 0],
                        [0, 0, 0, 0], 
                        [0, 0, 0, 1]])
         
@@ -261,15 +261,15 @@ def main():
 
     hexagono.escala(6,6,6)
     hexagono.translacao(550,-150,0)
-    hexagono.rotX(0.5)
-    hexagono.rotY(0.5)
-    hexagono.rotZ(0.5)
+    #hexagono.rotX(0.5)
+    #hexagono.rotY(0.5)
+    #hexagono.rotZ(0.5)
     
     #projeção isométrica
     #hexagono.projIsometrica(0.5,0.5)
 
     #projeção obliqua com meu número da chamada vezes 5
-    #hexagono.projObliqua(15, 1)
+    hexagono.projObliquaCabinet(15, 1)
     
     #um ponto de fuga com zcp = 100 + 10x3
     #hexagono.projPerspecUmPontoFuga(130)
