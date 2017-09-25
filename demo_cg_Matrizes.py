@@ -56,9 +56,9 @@ class Solido:
     def rotY(self, radianos):
         c = np.cos(radianos)
         s = np.sin(radianos)
-        rY = np.array([[c, 0, -s, 0],
+        rY = np.array([[c, 0, s, 0],
                        [0, 1, 0, 0],
-                       [s, 0, c, 0],
+                       [-s, 0, c, 0],
                        [0, 0, 0, 1]])
 
         centro = self.getCentro()
@@ -103,6 +103,52 @@ class Solido:
         self.vertices = np.dot(self.vertices, e)
         self.translacao(centro[0], centro[1], centro[2])
 
+    def projIsometrica(self, angX, angY):
+        cx = np.cos(-angX)
+        sx = np.sin(-angX)
+        cy = np.cos(angY)
+        sy = np.sin(angY)
+        rI = np.array([[cy, 0, 0, 0],
+                       [sy*sx, cx, sy, 0],
+                       [0, 0, -sx*cy, 0],
+                       [0, 0, 0, 1]])
+
+        centro = self.getCentro()
+        self.translacao(-centro[0], -centro[1], -centro[2])
+        self.vertices = self.vertices.transpose()
+        self.vertices = np.dot(rI, self.vertices)
+        self.vertices = self.vertices.transpose()
+        self.translacao(centro[0], centro[1], centro[2])
+
+    def projObliqua(self, ang, l):
+        c = np.cos(ang)
+        s = np.sin(ang)
+
+        obl = np.array([[1, 0, l*c, 0],
+                       [0, 1, l*s, 0],
+                       [0, 0, 0, 0], 
+                       [0, 0, 0, 1]])
+        
+        centro = self.getCentro()
+        self.translacao(-centro[0], -centro[1], -centro[2])
+        self.vertices = self.vertices.transpose()
+        self.vertices = np.dot(obl, self.vertices)
+        self.vertices = self.vertices.transpose()
+        self.translacao(centro[0], centro[1], centro[2])
+
+    def projPerspecUmPontoFuga(self, zcp):
+        upf = np.array([[1, 0, 0, 0],
+                       [0, 1, 0, 0],
+                       [0, 0, 0, -1/zcp], 
+                       [0, 0, 0, 1]])
+        
+        centro = self.getCentro()
+        self.translacao(-centro[0], -centro[1], -centro[2])
+        self.vertices = self.vertices.transpose()
+        self.vertices = np.dot(upf, self.vertices)
+        self.vertices = self.vertices.transpose()
+        self.translacao(centro[0], centro[1], centro[2])
+
     def getCentro(self):
         n_vertices = len(self.vertices)
         vert = []
@@ -143,7 +189,7 @@ class Solido:
             p.setFill(cores[j])
             p.setOutline("black")
             p.draw(window)
-            time.sleep(.2)
+            time.sleep(.3)
             update(60)
             if (j > 3):
                 j = 0
@@ -151,20 +197,19 @@ class Solido:
     
     def pintaPontos(self, window):
         i = 40
-        pontos = []
+        j = 0
         for vertice in self.vertices:
             s = ' ,'.join(str(e) for e in (vertice[0], vertice[1], vertice[2]))
-            ponto = Point(10,i)
-            pontos.append((10,i))
-            clique = Circle(ponto, 6)
+            txt2 = Text(Point(13,i), str(j) + ": ")
             txt = Text(Point(200,i),s)
             txt.setFace("arial")
             txt.setStyle("bold")
-            clique.setFill("blue")
             txt.draw(window)
-            clique.draw(window)
+            txt2.setFace("arial")
+            txt2.setStyle("bold")
+            txt2.draw(window)
             i += 40
-        return pontos
+            j += 1
 
 def clear(win):
     for item in win.items[:]:
@@ -189,9 +234,24 @@ def main():
                       [45,400,40],
                       [40,390,40],
                       [30,390,40]]
-                      
+
+    '''
+    hexagonVertices = [[25,400,0],
+                      [30,410,0],
+                      [40,410,0],
+                      [45,400,0],
+                      [40,390,0],
+                      [30,390,0],
+                      [25,400,0],
+                      [30,410,0],
+                      [40,410,0],
+                      [45,400,0],
+                      [40,390,0],
+                      [30,390,0]]
+    '''
+
     hexagonArestas = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,6],[1,7],[2,8],[3,9],[4,10],[5,11],[6,7],[7,8],[8,9],[9,10],[10,11],[11,6]]
-    hexagonoFaces1 = [[6,7,8,9,10,11], [1,7,8,2], [2,8,9,3], [3,9,10,4], [4,5,11,10], [5,0,6,11], [0,6,7,1], [0,1,2,3,4,5]]
+    hexagonoFaces1 = [[6,7,8,9,10,11], [1,7,8,2], [2,8,9,3], [3,9,10,4], [5,0,6,11], [0,6,7,1], [4,5,11,10], [0,1,2,3,4,5]]
 
     hexagono = Solido()
     hexagono.addVertices(np.array(hexagonVertices))
@@ -203,15 +263,25 @@ def main():
     hexagono.translacao(550,-150,0)
     hexagono.rotX(0.5)
     hexagono.rotY(0.5)
+    hexagono.rotZ(0.5)
     
-    print hexagono.vertices[0][0]
+    #projeção isométrica
+    #hexagono.projIsometrica(0.5,0.5)
+
+    #projeção obliqua com meu número da chamada vezes 5
+    #hexagono.projObliqua(15, 1)
+    
+    #um ponto de fuga com zcp = 100 + 10x3
+    #hexagono.projPerspecUmPontoFuga(130)
+    
+
     hexagono.pintaPontos(janela)
     hexagono.desenha(janela)
     hexagono.pinta(hexagonoFaces1, janela)
     update(60)
    
     while True:
-        ponto = input("Gostaria de ver algum vértice? Diga o número dele: ")
+        ponto = input("Gostaria de ver algum vertice? Diga o numero dele: ")
         pt = Circle(Point(hexagono.vertices[ponto][0], hexagono.vertices[ponto][1]), 4)
         pt.setFill("red")
         pt.draw(janela)
@@ -219,7 +289,7 @@ def main():
         time.sleep(.2)
         pt.undraw()
         update(60)
-    
+
     janela.getMouse()
     janela.close()
 main()
