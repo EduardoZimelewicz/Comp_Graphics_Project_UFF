@@ -30,8 +30,8 @@ class Solido:
 
     def outVertices(self):
         print "\n --- Vertices --- "
-        for i, (x, y, z, _) in enumerate(self.vertices):
-            print " %d: (%.2f, %.2f, %.2f)" % (i, x, y, z)
+        for i, (x, y, z, d) in enumerate(self.vertices):
+            print " %d: (%.2f, %.2f, %.2f, %.2f)" % (i, x, y, z, d)
 
     def outArestas(self):
         print "\n --- Arestas --- "
@@ -108,9 +108,9 @@ class Solido:
         sx = np.sin(-angX)
         cy = np.cos(angY)
         sy = np.sin(angY)
-        rI = np.array([[cy, 0, 0, 0],
-                       [sy*sx, cx, sy, 0],
-                       [0, 0, -sx*cy, 0],
+        rI = np.array([[cy, sy*sx, -sy*cx, 0],
+                       [0, cx, sx, 0],
+                       [sy, -sx*cy, cx*cy, 0],
                        [0, 0, 0, 1]])
 
         centro = self.getCentro()
@@ -141,14 +141,20 @@ class Solido:
                        [0, 1, 0, 0],
                        [0, 0, 0, -1/zcp], 
                        [0, 0, 0, 1]])
-        
+		
         centro = self.getCentro()
-        self.translacao(-centro[0], -centro[1], -centro[2])
-        self.vertices = self.vertices.transpose()
-        self.vertices = np.dot(upf, self.vertices)
-        self.vertices = self.vertices.transpose()
-        self.translacao(centro[0], centro[1], centro[2])
-
+        #self.translacao(-centro[0], -centro[1], -centro[2])
+        #self.vertices = self.vertices.transpose()
+        self.vertices = np.dot(self.vertices, upf)
+        #self.vertices = self.vertices.transpose()
+        #self.translacao(centro[0], centro[1], centro[2])
+        i = 0
+        for vertice in self.vertices:
+        	vertice[0] = vertice[0]/vertice[3]
+        	vertice[1] = vertice[1]/vertice[3]
+        	vertice[2] = vertice[2]/vertice[3]
+        	vertice[3] = vertice[3]/vertice[3]
+        	
     def getCentro(self):
         n_vertices = len(self.vertices)
         vert = []
@@ -222,12 +228,12 @@ def main():
     janela.setBackground(color_rgb(255,255,255))
     cx,cy = w//2, h//2
    
-    hexagonVertices = [[25,400,20],
-                      [30,410,20],
-                      [40,410,20],
-                      [45,400,20],
-                      [40,390,20],
-                      [30,390,20],
+    hexagonVertices = [[25,400,0],
+                      [30,410,0],
+                      [40,410,0],
+                      [45,400,0],
+                      [40,390,0],
+                      [30,390,0],
                       [25,400,40],
                       [30,410,40],
                       [40,410,40],
@@ -259,20 +265,23 @@ def main():
     #hexagono.outVertices()
     #hexagono.outArestas()
 
-    hexagono.escala(6,6,6)
-    hexagono.translacao(550,-150,0)
+    hexagono.escala(8,8,8)
+    hexagono.translacao(550,-150,1)
     #hexagono.rotX(0.5)
     #hexagono.rotY(0.5)
     #hexagono.rotZ(0.5)
     
     #projeção isométrica
-    #hexagono.projIsometrica(0.5,0.5)
+    hexagono.projIsometrica(35.26,45)
 
     #projeção obliqua com meu número da chamada vezes 5
-    hexagono.projObliquaCabinet(15, 1)
+    #hexagono.projObliquaCabinet((15*(np.pi/180)), 1)
     
     #um ponto de fuga com zcp = 100 + 10x3
-    #hexagono.projPerspecUmPontoFuga(130)
+    #hexagono.projPerspecUmPontoFuga(10)
+    #hexagono.escala(40,40,20)
+    #hexagono.translacao(500,150)
+    #hexagono.outVertices()
     
 
     hexagono.pintaPontos(janela)
@@ -286,7 +295,7 @@ def main():
         pt.setFill("red")
         pt.draw(janela)
         update(60)
-        time.sleep(.2)
+        time.sleep(.4)
         pt.undraw()
         update(60)
 
