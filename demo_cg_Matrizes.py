@@ -38,9 +38,10 @@ class Solido:
         for i, (vertice1, vertice2) in enumerate(self.arestas):
             print "%d: %d -> %d" % (i, vertice1, vertice2)
 
-    def rotZ(self, angulo):
-        c = np.cos(angulo)
-        s = np.sin(angulo)
+    def rotZ(self, ang):
+        radianos = ang*(np.pi/180)
+        c = np.cos(radianos)
+        s = np.sin(radianos)
         rZ = np.array([[c, -s, 0, 0],
                        [s, c, 0, 0],
                        [0, 0, 1, 0],
@@ -53,7 +54,8 @@ class Solido:
         self.vertices = self.vertices.transpose()
         self.translacao(centro[0], centro[1], centro[2])
 
-    def rotY(self, radianos):
+    def rotY(self, ang):
+        radianos = ang*(np.pi/180)
         c = np.cos(radianos)
         s = np.sin(radianos)
         rY = np.array([[c, 0, s, 0],
@@ -68,7 +70,8 @@ class Solido:
         self.vertices = self.vertices.transpose()
         self.translacao(centro[0], centro[1], centro[2])
 
-    def rotX(self, radianos):
+    def rotX(self, ang):
+        radianos = ang*(np.pi/180)
         c = np.cos(radianos)
         s = np.sin(radianos)
         rX = np.array([[1, 0, 0, 0],
@@ -104,10 +107,12 @@ class Solido:
         self.translacao(centro[0], centro[1], centro[2])
 
     def projIsometrica(self, angX, angY):
-        cx = np.cos(-angX)
-        sx = np.sin(-angX)
-        cy = np.cos(angY)
-        sy = np.sin(angY)
+        radianosX = angX*(np.pi/180)
+        radianosY = angY*(np.pi/180)
+        cx = np.cos(-radianosX)
+        sx = np.sin(-radianosX)
+        cy = np.cos(radianosY)
+        sy = np.sin(radianosY)
         rI = np.array([[cy, sy*sx, -sy*cx, 0],
                        [0, cx, sx, 0],
                        [sy, -sx*cy, cx*cy, 0],
@@ -121,8 +126,9 @@ class Solido:
         self.translacao(centro[0], centro[1], centro[2])
 
     def projObliquaCabinet(self, ang, l):
-        c = np.cos(ang)
-        s = np.sin(ang)
+        radianos = ang*(np.pi/180)
+        c = np.cos(radianos)
+        s = np.sin(radianos)
 
         obl = np.array([[1, 0, (l*c)/2, 0],
                        [0, 1, (l*s)/2, 0],
@@ -142,18 +148,15 @@ class Solido:
                        [0, 0, 0, -1/zcp], 
                        [0, 0, 0, 1]])
 		
-        centro = self.getCentro()
-        #self.translacao(-centro[0], -centro[1], -centro[2])
-        #self.vertices = self.vertices.transpose()
         self.vertices = np.dot(self.vertices, upf)
-        #self.vertices = self.vertices.transpose()
-        #self.translacao(centro[0], centro[1], centro[2])
-        i = 0
+        
         for vertice in self.vertices:
-        	vertice[0] = vertice[0]/vertice[3]
-        	vertice[1] = vertice[1]/vertice[3]
-        	vertice[2] = vertice[2]/vertice[3]
-        	vertice[3] = vertice[3]/vertice[3]
+            norm = vertice[3]
+            vertice[0] = abs(vertice[0]/norm)
+            vertice[1] = abs(vertice[1]/norm)
+            vertice[2] = abs(vertice[2]/norm)
+            vertice[3] = abs(vertice[3]/norm)
+        
         	
     def getCentro(self):
         n_vertices = len(self.vertices)
@@ -252,22 +255,20 @@ def main():
 
     hexagono.escala(8,8,8)
     hexagono.translacao(550,-150,1)
-    #hexagono.rotX(0.5)
-    #hexagono.rotY(0.5)
-    #hexagono.rotZ(0.5)
+    #hexagono.rotX(45)
+    #hexagono.rotY(45)
+    #hexagono.rotZ(45)
     
     #projeção isométrica
-    hexagono.projIsometrica(35.26,45)
+    #hexagono.projIsometrica(35.26,45)
 
     #projeção obliqua com meu número da chamada vezes 5
-    #hexagono.projObliquaCabinet((15*(np.pi/180)), 1)
+    #hexagono.projObliquaCabinet(15, 1)
     
     #um ponto de fuga com zcp = 100 + 10x3
-    #hexagono.projPerspecUmPontoFuga(10)
-    #hexagono.escala(40,40,20)
-    #hexagono.translacao(500,150)
-    #hexagono.outVertices()
-    
+    hexagono.projPerspecUmPontoFuga(130)
+    hexagono.escala(150,150,20)
+    hexagono.translacao(500,300)
 
     hexagono.pintaPontos(janela)
     hexagono.desenha(janela)
