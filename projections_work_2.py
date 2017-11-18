@@ -187,7 +187,7 @@ class Solido:
             time.sleep(.2)
             update(60)
 
-    def desenhaComRealismo(self, visoes, faces, grafico, normal, luz):
+    def desenhaComRealismo(self, visoes, faces, grafico, normal, luz, cores):
         j = 0
         coef = 0.8
         for face in faces:
@@ -207,14 +207,11 @@ class Solido:
                     update(60)
                 
                 v1 = np.array(normal[j])
-                v2 = np.array(luz)
+                v2 = np.array(luz[j])
                 cosLuz = angle_between(v1, v2)
-                R = abs(206*coef*cosLuz)
-                G = abs(19*coef*cosLuz)
-                B = abs(19*coef*cosLuz)
-                print R
-                print G
-                print B
+                R = abs(cores[0]*coef*cosLuz)
+                G = abs(cores[1]*coef*cosLuz)
+                B = abs(cores[2]*coef*cosLuz)
                 p = Polygon(pts)
                 p.setFill(color_rgb(R, G ,B))
                 p.setOutline(color_rgb(R, G, B))
@@ -223,6 +220,60 @@ class Solido:
             j+=1
 
     
+    def desenhaComRealismo(self, visoes, faces, grafico, normal, luz, cores, tipo):
+        j = 0
+        coef = 0.8
+        for face in faces:
+            if(visoes[j] == True):
+                i = 0
+                pts = []
+                for i in range(len(face)):
+                    if(i+1 < len(face)):   
+                        ptI = Point(int(self.vertices[face[i]][0]), int(self.vertices[face[i]][1]))
+                        ptF = Point(int(self.vertices[face[i+1]][0]), int(self.vertices[face[i+1]][1]))
+                    else:
+                        ptI = Point(int(self.vertices[face[i]][0]), int(self.vertices[face[i]][1]))
+                        ptF = Point(int(self.vertices[face[0]][0]), int(self.vertices[face[0]][1]))
+                    pts.append(ptI)
+                    line = Line(ptI, ptF)
+                    line.draw(grafico)
+                    update(60)
+                
+                v1 = np.array(normal[j])
+                v2 = np.array(luz[j])
+                cosLuz = angle_between(v1, v2)
+                if(tipo == 1):
+                    R = cores[0]*coef*cosLuz
+                    G = cores[1]*coef*cosLuz
+                    B = cores[2]*coef*cosLuz
+                elif(tipo == 2):
+                    cores2 = []
+                    cores2 = rgbToHsv(cores[0], cores[1], cores[2])
+                    R = cores2[0]*coef*cosLuz
+                    G = cores2[1]*coef*cosLuz
+                    B = cores2[2]*coef*cosLuz
+                    cores2 = hsvToRgb(R,G,B)
+                    print R,G,B
+                    R = cores2[0]
+                    G = cores2[1]
+                    B = cores2[2]
+                elif(tipo == 3):
+                    cores3 = []
+                    cores3 = rgbToCmy(cores[0], cores[1], cores[2])
+                    R = cores3[0]*coef*cosLuz
+                    G = cores3[1]*coef*cosLuz
+                    B = cores3[2]*coef*cosLuz
+                    cores3 = cmyToRgb(R,G,B)
+                    R = cores3[0]
+                    G = cores3[1]
+                    B = cores3[2]
+                p = Polygon(pts)
+                p.setFill(color_rgb(R, G ,B))
+                p.setOutline(color_rgb(R, G, B))
+                p.draw(grafico)
+                update(60)
+            j+=1
+
     def pinta(self, faces, window):
         cores = ["green", "blue", "grey", "orange", "purple"]
         j = 0
@@ -274,6 +325,100 @@ def clear(win):
         item.undraw()
     win.update()
 
+def rgbToHsv(r,g,b):
+    maxValue = max(r,g,b)
+    minValue = min(r,g,b)
+    value = maxValue 
+    delta = maxValue - minValue
+    cores = []
+    if(maxValue != 0):
+        saturation = delta / maxValue
+    else:
+        cores.append(-1)
+        cores.append(0)
+        cores.append(value)
+        return cores
+
+    if(r == max(r,g,b)):
+        hue = (g - b) / delta
+    elif(g == max(r,g,b)):
+        hue = 2 + (b - r) / delta 
+    else:
+        hue = 4 + (r - g) / delta
+    hue *= 60
+    if(hue < 0):
+        hue += 360
+    cores.append(hue)
+    cores.append(saturation)
+    cores.append(value)
+    return cores
+
+def rgbToCmy(r,g,b):
+    c = 1 - (r/255)
+    m = 1 - (g/255)
+    y = 1 - (b/255)
+    cores = []
+    cores.append(c)
+    cores.append(m)
+    cores.append(y)
+    return cores
+
+def cmyToRgb(c,m,y):
+    r = 255 * (1 - c)
+    g = 255 * (1 - m)
+    b = 255 * (1 - y)
+    cores = []
+    cores.append(r)
+    cores.append(g)
+    cores.append(b)
+    return cores
+
+def hsvToRgb(h,s,v):
+    cores = []
+    if (s == 0):
+        r = v
+        g = v
+        b = v
+        cores.append(r)
+        cores.append(g)
+        cores.append(b)
+        return cores
+    h /= 60
+    i = math.floor(h)
+    f = h - i
+    p = v * (1-s)
+    q = v * (1-s * f)
+    t = v * (1-s * (1-f))
+
+    if(i == 0):
+        r = v
+        g = t
+        b = p
+    elif(i == 1):
+        r = q
+        g = v
+        b = p
+    elif(i == 2):
+        r = p
+        g = v
+        b = t
+    elif(i == 3):
+        r = p
+        g = q
+        b = v
+    elif(i == 4):
+        r = t
+        g = p
+        b = v
+    else:
+        r = v
+        g = p
+        b = q
+    cores.append(r)
+    cores.append(g)
+    cores.append(b)
+    return cores
+
 def calcularNormal(vertice1, vertice0, vertice2):
         normal = []
         sub1 =  np.subtract(vertice1, vertice0)
@@ -287,6 +432,10 @@ def checarVisao(vertice, normal, anguloVisao):
     if(resultado >= 0):
         return True
     return False
+
+def retornaVetorLuz(vertice, luz):
+    sub = np.subtract(vertice[:3], luz)
+    return sub
 
 def main():
     w,h = 800,600
@@ -347,12 +496,43 @@ def main():
     visoes.append(checarVisao(vertices[3], normais[6], visao))       
     visoes.append(checarVisao(vertices[8], normais[7], visao))
 
-    luz = [480.0, -830.0, -70.0]
-    hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luz)
+    luz = [480.0, 330.0, -70.0]
+    luzes = []
+    luzes.append(retornaVetorLuz(vertices[1], luz))
+    luzes.append(retornaVetorLuz(vertices[11], luz))
+    luzes.append(retornaVetorLuz(vertices[6], luz))
+    luzes.append(retornaVetorLuz(vertices[7], luz))
+    luzes.append(retornaVetorLuz(vertices[8], luz))
+    luzes.append(retornaVetorLuz(vertices[2], luz))
+    luzes.append(retornaVetorLuz(vertices[3], luz))
+    luzes.append(retornaVetorLuz(vertices[8], luz))
+
+    cores = [206, 19, 40]
+    #hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores)
 
     while janelaAberta:
-        opcao = raw_input("digite 'q' para sair: ")
-        if(opcao == 'q'):
+        print "\n"
+        opcao = raw_input("digite 1 para cores em RGB, 2 para cores em HSV ou 3 para cores em CMY, digite 'q' para sair: ")
+        
+        if(opcao == '1'):
+            clear(janela)
+            update(60)
+            cores = [206, 19, 40]
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores, 1)
+
+        elif(opcao == '2'):
+            clear(janela)
+            update(60)
+            cores = [206, 19, 40]
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores, 2)
+        
+        elif(opcao == '3'):
+            clear(janela)
+            update(60)
+            cores = [206, 19, 40]
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores, 3)
+        
+        elif(opcao == 'q'):
             janelaAberta = False
             janela.close()
             break
