@@ -186,39 +186,6 @@ class Solido:
             cF.setFill("yellow")
             time.sleep(.2)
             update(60)
-
-    def desenhaComRealismo(self, visoes, faces, grafico, normal, luz, cores):
-        j = 0
-        coef = 0.8
-        for face in faces:
-            if(visoes[j] == True):
-                i = 0
-                pts = []
-                for i in range(len(face)):
-                    if(i+1 < len(face)):   
-                        ptI = Point(int(self.vertices[face[i]][0]), int(self.vertices[face[i]][1]))
-                        ptF = Point(int(self.vertices[face[i+1]][0]), int(self.vertices[face[i+1]][1]))
-                    else:
-                        ptI = Point(int(self.vertices[face[i]][0]), int(self.vertices[face[i]][1]))
-                        ptF = Point(int(self.vertices[face[0]][0]), int(self.vertices[face[0]][1]))
-                    pts.append(ptI)
-                    line = Line(ptI, ptF)
-                    line.draw(grafico)
-                    update(60)
-                
-                v1 = np.array(normal[j])
-                v2 = np.array(luz[j])
-                cosLuz = angle_between(v1, v2)
-                R = abs(cores[0]*coef*cosLuz)
-                G = abs(cores[1]*coef*cosLuz)
-                B = abs(cores[2]*coef*cosLuz)
-                p = Polygon(pts)
-                p.setFill(color_rgb(R, G ,B))
-                p.setOutline(color_rgb(R, G, B))
-                p.draw(grafico)
-                update(60)
-            j+=1
-
     
     def desenhaComRealismo(self, visoes, faces, grafico, normal, luz, cores, tipo):
         j = 0
@@ -253,7 +220,6 @@ class Solido:
                     G = cores2[1]*coef*cosLuz
                     B = cores2[2]*coef*cosLuz
                     cores2 = hsvToRgb(R,G,B)
-                    print R,G,B
                     R = cores2[0]
                     G = cores2[1]
                     B = cores2[2]
