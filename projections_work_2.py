@@ -186,8 +186,8 @@ class Solido:
             cF.setFill("yellow")
             time.sleep(.2)
             update(60)
-    
-    def desenhaComRealismo(self, visoes, faces, grafico, normal, luz, cores, tipo):
+
+    def desenhaComRealismo(self, visoes, faces, grafico, normal, luz, tipo):
         j = 0
         coef = 0.8
         for face in faces:
@@ -209,30 +209,67 @@ class Solido:
                 v1 = np.array(normal[j])
                 v2 = np.array(luz[j])
                 cosLuz = angle_between(v1, v2)
+                
                 if(tipo == 1):
-                    R = cores[0]*coef*cosLuz
-                    G = cores[1]*coef*cosLuz
-                    B = cores[2]*coef*cosLuz
+                    hsv = [0,1,255]
+                    R = hsv[0]
+                    G = hsv[1]
+                    B = hsv[2]*coef*cosLuz
+                    cores = hsvToRgb(R,G,B)
+                    R = cores[0]
+                    G = cores[1]
+                    B = cores[2]
+
                 elif(tipo == 2):
-                    cores2 = []
-                    cores2 = rgbToHsv(cores[0], cores[1], cores[2])
-                    R = cores2[0]*coef*cosLuz
-                    G = cores2[1]*coef*cosLuz
-                    B = cores2[2]*coef*cosLuz
-                    cores2 = hsvToRgb(R,G,B)
-                    R = cores2[0]
-                    G = cores2[1]
-                    B = cores2[2]
+                    hsv = [60,1,255]
+                    R = hsv[0]
+                    G = hsv[1]
+                    B = hsv[2]*coef*cosLuz
+                    cores = hsvToRgb(R,G,B)
+                    R = cores[0]
+                    G = cores[1]
+                    B = cores[2]
+
                 elif(tipo == 3):
-                    cores3 = []
-                    cores3 = rgbToCmy(cores[0], cores[1], cores[2])
-                    R = cores3[0]*coef*cosLuz
-                    G = cores3[1]*coef*cosLuz
-                    B = cores3[2]*coef*cosLuz
-                    cores3 = cmyToRgb(R,G,B)
-                    R = cores3[0]
-                    G = cores3[1]
-                    B = cores3[2]
+                    hsv = [120,1,255]
+                    R = hsv[0]
+                    G = hsv[1]
+                    B = hsv[2]*coef*cosLuz
+                    cores = hsvToRgb(R,G,B)
+                    R = cores[0]
+                    G = cores[1]
+                    B = cores[2]
+                
+                elif(tipo == 4):
+                    hsv = [180,1,255]
+                    R = hsv[0]
+                    G = hsv[1]
+                    B = hsv[2]*coef*cosLuz
+                    cores = hsvToRgb(R,G,B)
+                    R = cores[0]
+                    G = cores[1]
+                    B = cores[2]
+                
+                elif(tipo == 5):
+                    hsv = [240,1,255]
+                    R = hsv[0]
+                    G = hsv[1]
+                    B = hsv[2]*coef*cosLuz
+                    cores = hsvToRgb(R,G,B)
+                    R = cores[0]
+                    G = cores[1]
+                    B = cores[2]
+                
+                elif(tipo == 6):
+                    hsv = [300,1,255]
+                    R = hsv[0]
+                    G = hsv[1]
+                    B = hsv[2]*coef*cosLuz
+                    cores = hsvToRgb(R,G,B)
+                    R = cores[0]
+                    G = cores[1]
+                    B = cores[2]
+                    
                 p = Polygon(pts)
                 p.setFill(color_rgb(R, G ,B))
                 p.setOutline(color_rgb(R, G, B))
@@ -473,30 +510,44 @@ def main():
     luzes.append(retornaVetorLuz(vertices[3], luz))
     luzes.append(retornaVetorLuz(vertices[8], luz))
 
-    cores = [206, 19, 40]
+    cores = [255, 255, 0]
+    cores = rgbToHsv(cores[0], cores[1], cores[2])
+    print cores
     #hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores)
 
     while janelaAberta:
         print "\n"
-        opcao = raw_input("digite 1 para cores em RGB, 2 para cores em HSV ou 3 para cores em CMY, digite 'q' para sair: ")
+        opcao = raw_input("digite a opção para cada cor, digite 'q' para sair: ")
         
         if(opcao == '1'):
             clear(janela)
             update(60)
-            cores = [206, 19, 40]
-            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores, 1)
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, 1)
 
         elif(opcao == '2'):
             clear(janela)
             update(60)
-            cores = [206, 19, 40]
-            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores, 2)
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, 2)
         
         elif(opcao == '3'):
             clear(janela)
             update(60)
-            cores = [206, 19, 40]
-            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores, 3)
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, 3)
+        
+        elif(opcao == '4'):
+            clear(janela)
+            update(60)
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, 4)
+        
+        elif(opcao == '5'):
+            clear(janela)
+            update(60)
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, 5)
+        
+        elif(opcao == '6'):
+            clear(janela)
+            update(60)
+            hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, 6)
         
         elif(opcao == 'q'):
             janelaAberta = False
