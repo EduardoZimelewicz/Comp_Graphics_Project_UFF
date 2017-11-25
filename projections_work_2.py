@@ -512,13 +512,21 @@ def main():
 
     cores = [255, 255, 0]
     cores = rgbToHsv(cores[0], cores[1], cores[2])
-    print cores
-    #hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cores)
 
+    cor = 0
     while janelaAberta:
-        print "\n"
-        opcao = raw_input("digite a opção para cada cor, digite 'q' para sair: ")
+        cor += 1
+        if(cor == 7):
+            cor = 1
+        time.sleep(2)
+        clear(janela)
+        update(60)
+        hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cor)
         
+        #print "\n"
+        #opcao = raw_input("digite a opção para cada cor de 1 a 6, digite 'q' para sair: ")
+        
+        '''
         if(opcao == '1'):
             clear(janela)
             update(60)
@@ -553,4 +561,5 @@ def main():
             janelaAberta = False
             janela.close()
             break
+        '''
 main()
