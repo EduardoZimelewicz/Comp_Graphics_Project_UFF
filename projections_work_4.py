@@ -189,7 +189,7 @@ class Solido:
 
     def desenhaComRealismo(self, visoes, faces, grafico, normal, luz, tipo):
         j = 0
-        coef = 0.3
+        coef = 0.5
         for face in faces:
             if(visoes[j] == True):
                 i = 0
@@ -215,7 +215,6 @@ class Solido:
                     R = hsv[0]
                     G = hsv[1]
                     B = hsv[2]*coef*cosLuz
-                    print R,G,B
                     cores = hsvToRgb(R,G,B)
                     R = cores[0]
                     G = cores[1]
@@ -271,7 +270,6 @@ class Solido:
                     G = cores[1]
                     B = cores[2]
                     
-                print R,G,B
                 p = Polygon(pts)
                 p.setFill(color_rgb(R, G ,B))
                 p.setOutline(color_rgb(R, G, B))
@@ -318,13 +316,21 @@ class Solido:
             j += 1
     
     def rotateQuartenion(self, axis):
-        quat = axisangle_to_q(axis, 3.14/2)
+        quat = axisangle_to_q(axis, np.pi/6)
         i = 0
+        v = []
         for i in range(len(self.vertices)):
-            self.vertices[i][:3] = qv_mult(quat, self.vertices[i])
+            v = qv_mult(quat, self.vertices[i][0:3])
+            self.vertices[i][0] = v[0]
+            self.vertices[i][1] = v[1]
+            self.vertices[i][2] = v[2]
 
 def qv_mult(q1, v1):
-    q2 = (0.0,) + v1
+    q2 = []
+    q2.append(0.0)
+    q2.append(v1[0])
+    q2.append(v1[1])
+    q2.append(v1[2])
     return q_mult(q_mult(q1, q2), q_conjugate(q1))[1:]
 
 def q_conjugate(q):
@@ -560,6 +566,10 @@ def main():
     luz = [480.0, 330.0, -70.0]
     luzes = []
     
+    hexagono.projPerspecUmPontoFuga(130)
+    hexagono.escala(150,150,20)
+    hexagono.translacao(500,300)
+
     cor = 0
     eixo = -1
     while janelaAberta:
@@ -567,31 +577,23 @@ def main():
         eixo += 1
         if(cor == 7):
             cor = 1
-        if(eixo == 3):
-            eixo = -1
-        axis = [[1,0,0], [0,1,0], [0,0,1]]
-        hexagono.rotateQuartenion(axis[eixo])
-        hexagono.translacao(500,300)
-        #hexagono.projPerspecUmPontoFuga(130)
-        hexagono.projObliquaCabinet(15,1)
-        #hexagono.escala(150,150,20)
-        #hexagono.translacao(500,300)
+        if(eixo == 7):
+            eixo = 0
+        axis = [[-1,0,1], [0,1,0], [1,-1,-1], [0,1,-1], [-1,0,0], [1,-1,0], [0,0,-1]]
+        #hexagono.outVertices()
         
-        hexagono.outVertices()
+        centro = hexagono.getCentro()
+        hexagono.translacao(-centro[0], -centro[1], -centro[2])
+        hexagono.rotateQuartenion(axis[eixo])
+        hexagono.translacao(centro[0], centro[1], centro[2])
+        
 
         normais = calcularNormais(hexagono.vertices)
-        print normais
         visoes = calcularVisao(hexagono.vertices, normais, visao)
-        print visoes
         luzes = calcularLuz(hexagono.vertices, luz)
 
-        time.sleep(2)
+        time.sleep(.5)
         clear(janela)
         update(60)
         hexagono.desenhaComRealismo(visoes, hexagonoFaces1, janela, normais, luzes, cor)
-        
-        opcao = raw_input("digite q para cancelar: ")
-        if (opcao == 'q'):
-            janela.close()
-            janelaAberta = False
 main()
