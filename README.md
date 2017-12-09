@@ -1,3 +1,9 @@
-First level of Computer Graphics work for UFF Computer Graphics Course
+Introduction Course of Computer Graphics Projects for UFF Computer Graphics Course
 
 First Level - Isometric, Oblique and One Vanishing Point Projections
+
+Second Level - Flat Shading
+
+Third Level - Bezier Curves with Flat Shading
+
+Forth Level - Quaternions Animations
